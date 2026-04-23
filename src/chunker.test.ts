@@ -3,14 +3,17 @@ import assert from "node:assert/strict";
 import { chunkMarkdown } from "./chunker.js";
 
 describe("chunkMarkdown", () => {
+  // @lat: [[tests#Chunker Tests#Returns empty array for empty string]]
   it("returns empty array for empty string", () => {
     assert.deepStrictEqual(chunkMarkdown(""), []);
   });
 
+  // @lat: [[tests#Chunker Tests#Returns empty array for whitespace-only string]]
   it("returns empty array for whitespace-only string", () => {
     assert.deepStrictEqual(chunkMarkdown("   \n\n  "), []);
   });
 
+  // @lat: [[tests#Chunker Tests#Returns single chunk for short content]]
   it("returns single chunk for short content", () => {
     const md = "# Title\n\nSome paragraph.";
     const chunks = chunkMarkdown(md);
@@ -21,6 +24,7 @@ describe("chunkMarkdown", () => {
     assert.equal(chunks[0].charOffset, 0);
   });
 
+  // @lat: [[tests#Chunker Tests#Splits on ## headings]]
   it("splits on ## headings", () => {
     const md = [
       "# Title",
@@ -44,6 +48,7 @@ describe("chunkMarkdown", () => {
     assert.ok(headings.includes("Section Two"));
   });
 
+  // @lat: [[tests#Chunker Tests#Assigns intro heading for content before first heading]]
   it("assigns 'intro' heading for content before first heading", () => {
     const md = [
       "Some intro text before any heading.",
@@ -56,6 +61,7 @@ describe("chunkMarkdown", () => {
     assert.equal(chunks[0].heading, "intro");
   });
 
+  // @lat: [[tests#Chunker Tests#Handles markdown with no headings (paragraphs only)]]
   it("handles markdown with no headings (paragraphs only)", () => {
     const para1 = "First paragraph with some content.";
     const para2 = "Second paragraph with more content.";
@@ -69,6 +75,7 @@ describe("chunkMarkdown", () => {
     }
   });
 
+  // @lat: [[tests#Chunker Tests#Hard-splits a very long single paragraph]]
   it("hard-splits a very long single paragraph", () => {
     const longText = "A".repeat(500);
     const chunks = chunkMarkdown(longText, 100);
@@ -81,6 +88,7 @@ describe("chunkMarkdown", () => {
     assert.ok(totalLen >= longText.length, "Hard-split should cover all text");
   });
 
+  // @lat: [[tests#Chunker Tests#Hard-split chunks have overlap]]
   it("hard-split chunks have overlap", () => {
     const longText = "ABCDEFGHIJ".repeat(50); // 500 chars
     const maxSize = 100;
@@ -104,6 +112,7 @@ describe("chunkMarkdown", () => {
     }
   });
 
+  // @lat: [[tests#Chunker Tests#Preserves code blocks in chunks]]
   it("preserves code blocks in chunks", () => {
     const md = [
       "## Code Example",
@@ -124,6 +133,7 @@ describe("chunkMarkdown", () => {
     assert.ok(allText.includes("```"));
   });
 
+  // @lat: [[tests#Chunker Tests#Merges tiny chunks with neighbors]]
   it("merges tiny chunks with neighbors", () => {
     // Create content where some sections are very small
     const md = [
@@ -149,6 +159,7 @@ describe("chunkMarkdown", () => {
     );
   });
 
+  // @lat: [[tests#Chunker Tests#Tracks startLine correctly across sections]]
   it("tracks startLine correctly across sections", () => {
     const md = [
       "Line 0",
@@ -163,6 +174,7 @@ describe("chunkMarkdown", () => {
     assert.equal(chunks[0].startLine, 0);
   });
 
+  // @lat: [[tests#Chunker Tests#Tracks charOffset correctly]]
   it("tracks charOffset correctly", () => {
     const md = "Short intro.\n\n## Heading\n\nBody text here.";
     const chunks = chunkMarkdown(md, 20);
@@ -172,6 +184,7 @@ describe("chunkMarkdown", () => {
     }
   });
 
+  // @lat: [[tests#Chunker Tests#Handles level 3-6 headings as section breaks]]
   it("handles level 3-6 headings as section breaks", () => {
     const md = [
       "### Level 3 Heading",
@@ -190,6 +203,7 @@ describe("chunkMarkdown", () => {
     );
   });
 
+  // @lat: [[tests#Chunker Tests#Does NOT split on level 1 headings]]
   it("does NOT split on level 1 headings (# Title)", () => {
     // The HEADING_RE matches #{2,6}, so # should not trigger a split
     const md = [
@@ -207,6 +221,7 @@ describe("chunkMarkdown", () => {
     assert.equal(chunks[0].heading, "intro");
   });
 
+  // @lat: [[tests#Chunker Tests#Respects custom maxChunkSize]]
   it("respects custom maxChunkSize", () => {
     const md = "Word ".repeat(200); // ~1000 chars
     const chunks = chunkMarkdown(md, 100);
@@ -218,6 +233,7 @@ describe("chunkMarkdown", () => {
     }
   });
 
+  // @lat: [[tests#Chunker Tests#Respects custom minChunkSize for merging]]
   it("respects custom minChunkSize for merging", () => {
     // With a very high minChunkSize, small chunks should be aggressively merged
     const md = [

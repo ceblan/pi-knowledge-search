@@ -13,6 +13,7 @@ import { createEmbedder } from "./embedder";
 import { KnowledgeIndex } from "./index-store";
 import { BedrockKBSearcher } from "./kb-searcher";
 
+// @lat: [[extension-interface]]
 export default function (pi: ExtensionAPI) {
   let index: KnowledgeIndex | null = null;
   let kbSearcher: BedrockKBSearcher | null = null;

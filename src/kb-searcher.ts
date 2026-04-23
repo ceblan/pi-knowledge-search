@@ -15,6 +15,7 @@ export interface KnowledgeBaseConfig {
  * Searches one or more Bedrock Knowledge Bases and returns results
  * normalized to the same SearchResult shape as local index results.
  */
+// @lat: [[kb-searcher]]
 export class BedrockKBSearcher {
   private configs: KnowledgeBaseConfig[];
   private clients: Map<string, { client: any; config: KnowledgeBaseConfig }> =
@@ -71,6 +72,7 @@ export class BedrockKBSearcher {
     }
   }
 
+  // @lat: [[kb-searcher#Search]]
   async search(
     query: string,
     limit: number,

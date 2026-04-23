@@ -3,6 +3,7 @@ import type { ProviderConfig } from "./config";
 /**
  * Unified embedding interface. Implementations for OpenAI, Bedrock, and Ollama.
  */
+// @lat: [[embedding#Embedder Interface]]
 export interface Embedder {
   embed(text: string, signal?: AbortSignal): Promise<number[]>;
   embedBatch(
@@ -16,6 +17,7 @@ export interface Embedder {
 // Factory
 // ---------------------------------------------------------------------------
 
+// @lat: [[embedding#Provider Implementations]]
 export function createEmbedder(
   config: ProviderConfig,
   dimensions: number
@@ -31,7 +33,7 @@ export function createEmbedder(
         dimensions
       );
     case "ollama":
-      return new OllamaEmbedder(config.url, config.model);
+      return new OllamaEmbedder(config.url, config.model, dimensions);
   }
 }
 
@@ -40,6 +42,7 @@ export function createEmbedder(
 // ---------------------------------------------------------------------------
 
 /** Truncate to stay within token limits. Conservative: ~10K chars ≈ 4-6K tokens. */
+// @lat: [[embedding#Text Truncation]]
 function truncate(text: string, maxChars = 10000): string {
   return text.length > maxChars ? text.slice(0, maxChars) : text;
 }
@@ -47,6 +50,7 @@ function truncate(text: string, maxChars = 10000): string {
 const RETRY_DELAYS = [1000, 2000, 4000]; // exponential backoff for 429s
 
 /** Retry a fetch-based operation on 429 rate-limit errors with exponential backoff. */
+// @lat: [[embedding#Rate Limit Handling]]
 async function withRateLimitRetry<T>(
   fn: () => Promise<T>,
   label: string
@@ -73,6 +77,7 @@ async function withRateLimitRetry<T>(
 }
 
 /** Run an async function over an array with bounded concurrency. */
+// @lat: [[embedding#Batch Processing]]
 async function parallelMap<T, R>(
   items: T[],
   fn: (item: T, index: number) => Promise<R>,
@@ -274,10 +279,12 @@ class BedrockEmbedder implements Embedder {
 class OllamaEmbedder implements Embedder {
   private url: string;
   private model: string;
+  private dimensions?: number;
 
-  constructor(url: string, model: string) {
+  constructor(url: string, model: string, dimensions?: number) {
     this.url = url.replace(/\/$/, "");
     this.model = model;
+    this.dimensions = dimensions;
   }
 
   async embed(text: string, signal?: AbortSignal): Promise<number[]> {
@@ -285,7 +292,11 @@ class OllamaEmbedder implements Embedder {
       const res = await fetch(`${this.url}/api/embed`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: this.model, input: truncate(text) }),
+        body: JSON.stringify({
+          model: this.model,
+          input: truncate(text),
+          ...(this.dimensions !== undefined ? { dimensions: this.dimensions } : {}),
+        }),
         signal,
       });
 

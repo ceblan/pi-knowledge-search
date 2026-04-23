@@ -31,6 +31,7 @@ const HEADING_RE = /^(#{2,6})\s+(.+)$/;
  * 6. For files with no headings, split on paragraphs
  * 7. Each chunk gets the file's title (first # heading or filename) prepended for context
  */
+// @lat: [[chunking#Strategy]]
 export function chunkMarkdown(
   content: string,
   maxChunkSize = 3000,
@@ -96,6 +97,7 @@ interface Section {
 }
 
 /** Split content into sections by level-2+ headings. */
+// @lat: [[chunking#Heading Splitting]]
 function splitByHeadings(content: string): Section[] {
   const lines = content.split("\n");
   const sections: Section[] = [];
@@ -143,6 +145,7 @@ function splitByHeadings(content: string): Section[] {
 }
 
 /** Split a section's text by double-newline paragraphs, respecting maxChunkSize. */
+// @lat: [[chunking#Paragraph Splitting]]
 function splitByParagraphs(
   text: string,
   heading: string,
@@ -189,6 +192,7 @@ function splitByParagraphs(
 }
 
 /** Hard-split an oversized chunk at maxSize with overlap. */
+// @lat: [[chunking#Hard Splitting]]
 function hardSplit(chunk: Chunk, maxSize: number, overlap: number): Chunk[] {
   const { text, heading, startLine, charOffset } = chunk;
   const chunks: Chunk[] = [];
@@ -213,6 +217,7 @@ function hardSplit(chunk: Chunk, maxSize: number, overlap: number): Chunk[] {
 }
 
 /** Merge chunks smaller than minSize with their neighbor. */
+// @lat: [[chunking#Tiny Chunk Merging]]
 function mergeTiny(
   chunks: Chunk[],
   minSize: number,

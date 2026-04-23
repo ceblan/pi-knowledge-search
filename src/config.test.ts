@@ -81,15 +81,18 @@ describe("config", () => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
+  // @lat: [[tests#Config Tests#getConfigPath returns env-configured path]]
   it("getConfigPath returns the env-configured path", () => {
     assert.equal(getConfigPath(), configFile);
   });
 
+  // @lat: [[tests#Config Tests#Returns null when no config file and no env vars]]
   it("returns null when no config file and no env vars", () => {
     const config = loadConfig();
     assert.equal(config, null);
   });
 
+  // @lat: [[tests#Config Tests#Loads valid config from file]]
   it("loads valid config from file", () => {
     fs.writeFileSync(
       configFile,
@@ -117,12 +120,14 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Returns null for corrupt JSON config file]]
   it("returns null for corrupt JSON config file", () => {
     fs.writeFileSync(configFile, "{ this is not valid json }}}}");
     const config = loadConfig();
     assert.equal(config, null);
   });
 
+  // @lat: [[tests#Config Tests#Uses env var KNOWLEDGE_SEARCH_DIRS as fallback]]
   it("uses env var KNOWLEDGE_SEARCH_DIRS as fallback", () => {
     process.env.KNOWLEDGE_SEARCH_DIRS = "/tmp/dir-a, /tmp/dir-b";
     process.env.OPENAI_API_KEY = "sk-env-key";
@@ -136,6 +141,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Applies default values for optional fields]]
   it("applies default values for optional fields", () => {
     fs.writeFileSync(
       configFile,
@@ -155,6 +161,7 @@ describe("config", () => {
     assert.equal(config!.dimensions, 512);
   });
 
+  // @lat: [[tests#Config Tests#Resolves tilde in directory paths]]
   it("resolves ~ in directory paths", () => {
     const originalHome = process.env.HOME;
     process.env.HOME = "/home/testuser";
@@ -176,6 +183,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Throws for openai provider without API key]]
   it("throws for openai provider without API key", () => {
     fs.writeFileSync(
       configFile,
@@ -188,6 +196,7 @@ describe("config", () => {
     assert.throws(() => loadConfig(), /API key required/);
   });
 
+  // @lat: [[tests#Config Tests#Configures bedrock provider]]
   it("configures bedrock provider", () => {
     fs.writeFileSync(
       configFile,
@@ -211,6 +220,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Configures ollama provider]]
   it("configures ollama provider", () => {
     fs.writeFileSync(
       configFile,
@@ -233,6 +243,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Throws for unknown provider type]]
   it("throws for unknown provider type", () => {
     fs.writeFileSync(
       configFile,
@@ -245,6 +256,7 @@ describe("config", () => {
     assert.throws(() => loadConfig(), /Unknown provider/);
   });
 
+  // @lat: [[tests#Config Tests#Env vars override config file values]]
   it("env vars override config file values", () => {
     fs.writeFileSync(
       configFile,
@@ -263,6 +275,7 @@ describe("config", () => {
     assert.equal(config!.dimensions, 1024);
   });
 
+  // @lat: [[tests#Config Tests#Env var overrides provider API key]]
   it("env var overrides provider API key", () => {
     fs.writeFileSync(
       configFile,
@@ -280,6 +293,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#saveConfig writes valid JSON to config path]]
   it("saveConfig writes valid JSON to config path", () => {
     const configData = {
       dirs: ["/tmp/saved"],
@@ -293,6 +307,7 @@ describe("config", () => {
     assert.equal(parsed.provider.type, "openai");
   });
 
+  // @lat: [[tests#Config Tests#Returns null when dirs resolve to empty]]
   it("returns null when dirs resolve to empty", () => {
     fs.writeFileSync(
       configFile,
@@ -306,6 +321,7 @@ describe("config", () => {
     assert.equal(config, null);
   });
 
+  // @lat: [[tests#Config Tests#Bedrock provider uses defaults when fields missing]]
   it("bedrock provider uses defaults when fields missing", () => {
     fs.writeFileSync(
       configFile,
@@ -324,6 +340,7 @@ describe("config", () => {
     }
   });
 
+  // @lat: [[tests#Config Tests#Ollama provider uses defaults when fields missing]]
   it("ollama provider uses defaults when fields missing", () => {
     fs.writeFileSync(
       configFile,

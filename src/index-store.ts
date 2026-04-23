@@ -41,6 +41,7 @@ export interface SearchResult {
 const INDEX_VERSION = 3; // Bumped from 2 for chunk support
 const MAX_EXCERPT_LENGTH = 3500; // Safety cap for stored excerpts
 
+// @lat: [[index-store]]
 export class KnowledgeIndex {
   private config: Config;
   private embedder: Embedder;
@@ -101,6 +102,7 @@ export class KnowledgeIndex {
     this.dirty = false;
   }
 
+  // @lat: [[index-store#Save Debouncing]]
   scheduleSave(): void {
     if (this.saveTimer) return;
     this.dirty = true;
@@ -154,6 +156,7 @@ export class KnowledgeIndex {
   /**
    * Scan all configured directories, find new/changed/removed files, update index.
    */
+  // @lat: [[index-store#Sync]]
   async sync(): Promise<{ added: number; updated: number; removed: number }> {
     const allFiles = this.scanAllFiles();
     const currentPaths = new Set(allFiles.map((f) => f.absPath));
@@ -270,6 +273,7 @@ export class KnowledgeIndex {
     await this.sync();
   }
 
+  // @lat: [[index-store#Search]]
   async search(
     query: string,
     limit: number,
@@ -313,6 +317,7 @@ export class KnowledgeIndex {
   /**
    * Update a single file in the index (called by watcher).
    */
+  // @lat: [[index-store#File Operations]]
   async updateFile(absPath: string, sourceDir: string): Promise<void> {
     if (!fs.existsSync(absPath)) {
       this.removeFile(absPath);
@@ -362,6 +367,7 @@ export class KnowledgeIndex {
     this.scheduleSave();
   }
 
+  // @lat: [[index-store#File Operations]]
   removeFile(absPath: string): void {
     const removed = this.removeAllChunks(absPath);
     if (removed > 0) {
@@ -473,6 +479,7 @@ export class KnowledgeIndex {
 }
 
 /** Dot product — works as cosine similarity when vectors are pre-normalized. */
+// @lat: [[index-store#Search]]
 export function dotProduct(a: number[], b: number[]): number {
   let sum = 0;
   const len = Math.min(a.length, b.length);

@@ -41,6 +41,7 @@ const CONFIG_PATH =
   process.env.KNOWLEDGE_SEARCH_CONFIG ||
   path.join(process.env.HOME || "/tmp", ".pi", "knowledge-search.json");
 
+// @lat: [[configuration#Config File]]
 export function getConfigPath(): string {
   return CONFIG_PATH;
 }
@@ -49,6 +50,7 @@ export function getConfigPath(): string {
  * Load config from file, with env var overrides.
  * Returns null if no config file exists (needs setup).
  */
+// @lat: [[configuration#Environment Variable Overrides]]
 export function loadConfig(): Config | null {
   // Try config file first
   let file: ConfigFile | null = null;
@@ -181,6 +183,7 @@ export function loadConfig(): Config | null {
 /**
  * Save config to file.
  */
+// @lat: [[configuration#Config File]]
 export function saveConfig(config: ConfigFile): void {
   const dir = path.dirname(CONFIG_PATH);
   fs.mkdirSync(dir, { recursive: true });

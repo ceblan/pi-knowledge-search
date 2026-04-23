@@ -14,6 +14,7 @@ process.on("unhandledRejection", (reason) => {
   process.exit(1);
 });
 
+// @lat: [[sync-worker#Process Model]]
 const config = loadConfig();
 if (!config) {
   process.exit(0);
